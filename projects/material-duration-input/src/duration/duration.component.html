@@ -1,0 +1,27 @@
+<div class="f gap8">
+  <input
+    class="flex1"
+    type="number"
+    maxlength="20"
+    matInput
+    [value]="duration()"
+    #matinput
+    [min]="0"
+    step="1"
+    (input)="updateDuration($event)"
+  />
+
+  @if (shouldLabelFloat) {
+    <div>
+      <mat-select
+        [value]="dimension()"
+        (selectionChange)="updateDimension($event)"
+        #matselect
+      >
+        @for (option of intervals; track option.title) {
+          <mat-option [value]="option">{{ option.title | translate }}</mat-option>
+        }
+      </mat-select>
+    </div>
+  }
+</div>

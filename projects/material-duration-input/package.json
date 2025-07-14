@@ -1,0 +1,32 @@
+{
+  "name": "@kovalenko/material-duration-input",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/core": ">=19",
+    "@angular/material": ">=19",
+    "@angular/cdk": ">=19",
+    "@ngx-translate/core": ">=16",
+    "@kovalenko/base-components": "^3"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/menelai/material-duration-input.git"
+  },
+  "keywords": [
+    "angular",
+    "material",
+    "form"
+  ],
+  "author": "Kovalenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/menelai/material-duration-input/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
