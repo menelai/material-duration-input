@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/menelai/material-duration-input/compare/v1.0.0...v1.0.1) (2026-02-16)
+
+
+### Bug Fixes
+
+* fixes ([3871298](https://github.com/menelai/material-duration-input/commit/387129857b6b2c015e498de2f80b4da11c7a2c61))
+
 # 1.0.0 (2025-07-14)
 
 
