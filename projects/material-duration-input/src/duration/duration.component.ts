@@ -44,7 +44,10 @@ export class DurationComponent extends BaseInputComponent<number> implements Aft
   private _to: any;
 
   override get focused(): boolean {
-    return (document.activeElement === this.input?.nativeElement) || this.select && (this.select.focused || this.select.panelOpen);
+    return !!(
+      (document.activeElement && document.activeElement === this.input?.nativeElement)
+      || this.select && (this.select.focused || this.select.panelOpen)
+    );
   }
 
   ngAfterViewInit(): void {
