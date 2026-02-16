@@ -9,9 +9,10 @@
     [min]="0"
     step="1"
     (input)="updateDuration($event)"
+    (blur)="stateChanges.next()"
   />
 
-  @if (shouldLabelFloat) {
+  @if (selectShown()) {
     <div>
       <mat-select
         [value]="dimension()"

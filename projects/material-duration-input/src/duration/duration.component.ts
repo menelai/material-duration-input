@@ -24,7 +24,7 @@ import {MAT_DURATION_INPUT} from '../config';
     TranslatePipe,
   ],
 })
-export class DurationComponent extends BaseInputComponent<number | null | undefined> implements AfterViewInit, DoCheck, Validator {
+export class DurationComponent extends BaseInputComponent<number> implements AfterViewInit, DoCheck, Validator {
   @ViewChild(MatSelect, {static: false}) select: MatSelect;
 
   readonly min = input(0);
@@ -33,7 +33,7 @@ export class DurationComponent extends BaseInputComponent<number | null | undefi
 
   readonly selectShown = signal(false);
 
-  readonly duration = signal<number | undefined>(undefined);
+  readonly duration = signal<number>(NaN);
 
   readonly intervals = inject(MAT_DURATION_INPUT);
 
@@ -48,7 +48,9 @@ export class DurationComponent extends BaseInputComponent<number | null | undefi
   }
 
   ngAfterViewInit(): void {
-    this.ngControl?.control?.setValidators(this.validate.bind(this));
+    if (typeof this.ngControl?.control?.setValidators === 'function') {
+      this.ngControl?.control?.setValidators(this.validate.bind(this));
+    }
   }
 
   override ngDoCheck(): void {
@@ -64,8 +66,8 @@ export class DurationComponent extends BaseInputComponent<number | null | undefi
     }
   }
 
-  override writeValue(value: number | null | undefined): void {
-    if (typeof value === 'number') {
+  override writeValue(value: number): void {
+    if (typeof value === 'number' && !isNaN(value)) {
       for (let i = this.intervals.length - 1; i >= 0; i--) {
         if (value % this.intervals[i].m === 0) {
           this.duration.set(value / this.intervals[i].m);
@@ -74,7 +76,7 @@ export class DurationComponent extends BaseInputComponent<number | null | undefi
         }
       }
     } else {
-      this.duration.set(undefined);
+      this.duration.set(NaN);
       this.dimension.set(this.getDefaultInterval());
     }
 
@@ -84,7 +86,7 @@ export class DurationComponent extends BaseInputComponent<number | null | undefi
   updateDuration(e: Event): void {
     const v = (e.target as HTMLInputElement).value;
 
-    this.duration.set(v ? Number(v) : undefined);
+    this.duration.set(v ? Number(v) : NaN);
     this.markControl();
   }
 
@@ -105,7 +107,7 @@ export class DurationComponent extends BaseInputComponent<number | null | undefi
   }
 
   private markControl(): void {
-    this.value = this.duration()! * this.dimension().m;
+    this.value = this.duration() * this.dimension().m;
     this.onTouched();
     this.ngControl!.control?.markAsDirty();
     this.stateChanges.next();
