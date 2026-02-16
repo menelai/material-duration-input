@@ -112,7 +112,9 @@ export class DurationComponent extends BaseInputComponent<number> implements Aft
   private markControl(): void {
     this.value = this.duration() * this.dimension().m;
     this.onTouched();
-    this.ngControl!.control?.markAsDirty();
+    if (typeof this.ngControl?.control?.markAsDirty === 'function') {
+      this.ngControl!.control?.markAsDirty();
+    }
     this.stateChanges.next();
   }
 
