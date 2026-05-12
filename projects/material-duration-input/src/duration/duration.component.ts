@@ -1,11 +1,22 @@
-import {AfterViewInit, Component, DoCheck, forwardRef, inject, input, signal, ViewChild} from '@angular/core';
-import {ValidationErrors, Validator} from '@angular/forms';
+import {
+  Component,
+  computed,
+  DoCheck,
+  ElementRef,
+  forwardRef,
+  inject,
+  Input,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import {MatFormFieldControl} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {MatOption, MatSelect, MatSelectChange} from '@angular/material/select';
-import {BaseInputComponent} from '@kovalenko/base-components';
 import {TranslatePipe} from '@ngx-translate/core';
+
 import {MAT_DURATION_INPUT} from '../config';
+import {BaseSignalInput} from '@kovalenko/base-components';
 
 @Component({
   selector: 'mat-duration',
@@ -24,64 +35,68 @@ import {MAT_DURATION_INPUT} from '../config';
     TranslatePipe,
   ],
 })
-export class DurationComponent extends BaseInputComponent<number> implements AfterViewInit, DoCheck, Validator {
-  @ViewChild(MatSelect, {static: false}) select: MatSelect;
+export class DurationComponent extends BaseSignalInput<number> implements DoCheck {
+  readonly select = viewChild(MatSelect);
+
+  override readonly val = signal<number>(NaN);
+
+  readonly input = viewChild.required<ElementRef<HTMLInputElement>>('matinput');
 
   readonly min = input(0);
 
   readonly max = input<number>();
 
-  readonly selectShown = signal(false);
-
   readonly duration = signal<number>(NaN);
 
-  readonly intervals = inject(MAT_DURATION_INPUT);
+  readonly intervals = input(inject(MAT_DURATION_INPUT));
 
-  readonly dimension = signal(this.getDefaultInterval());
+  readonly defaultInterval = computed(() => this.intervals().find(i => i.default) ?? this.intervals().at(0)!);
 
-  private _oldFocused: boolean;
+  readonly dimension = signal(this.defaultInterval());
 
-  private _to: any;
+  readonly selectShown = signal(false, {equal: (a, b) => a === b});
 
-  override get focused(): boolean {
-    return !!(
-      (document.activeElement && document.activeElement === this.input?.nativeElement)
-      || this.select && (this.select.focused || this.select.panelOpen)
-    );
+  #updatedManually = false;
+
+  @Input()
+  override set value(v: number) {
+    this.val.set(v);
+    this.stateChanges.next();
   }
 
-  ngAfterViewInit(): void {
-    if (typeof this.ngControl?.control?.setValidators === 'function') {
-      this.ngControl?.control?.setValidators(this.validate.bind(this));
-    }
+  override get value(): number {
+    return this.val();
+  }
+
+  override get focused(): boolean {
+    return !!(document.activeElement && document.activeElement === this.input().nativeElement
+      || this.select()?.panelOpen);
   }
 
   override ngDoCheck(): void {
     super.ngDoCheck();
-    if (this.shouldLabelFloat !== this._oldFocused) {
-      this._oldFocused = this.shouldLabelFloat;
-      if (this._to) {
-        clearTimeout(this._to);
-      }
-      this._to = setTimeout(() => {
-        this.selectShown.set(this._oldFocused);
-      });
-    }
+    this.selectShown.set(this.shouldLabelFloat);
   }
 
   override writeValue(value: number): void {
-    if (typeof value === 'number' && !isNaN(value)) {
-      for (let i = this.intervals.length - 1; i >= 0; i--) {
-        if (value % this.intervals[i].m === 0) {
-          this.duration.set(value / this.intervals[i].m);
-          this.dimension.set(this.intervals[i]);
-          break;
+    const intervals = this.intervals();
+
+    if (!this.#updatedManually) {
+      if (!isNaN(value)) {
+        for (let i = intervals.length - 1; i >= 0; i--) {
+          if (value % intervals[i].m === 0) {
+            this.duration.set(value / intervals[i].m);
+            this.dimension.set(intervals[i]);
+            break;
+          }
         }
+      } else {
+        this.duration.set(NaN);
+        this.dimension.set(this.defaultInterval());
       }
-    } else {
-      this.duration.set(NaN);
-      this.dimension.set(this.getDefaultInterval());
     }
+
+    this.#updatedManually = false;
 
     this.value = value;
   }
@@ -98,27 +113,11 @@ export class DurationComponent extends BaseInputComponent<number> implements Aft
     this.markControl();
   }
 
-  validate(): ValidationErrors | null {
-    let ret = null;
-    if (this.value! < this.min()) {
-      ret = {min: true};
-    } else if (this.max() != null && this.value! > this.max()!) {
-      ret = {max: true};
-    }
-
-    return ret;
-  }
-
   private markControl(): void {
+    this.#updatedManually = true;
     this.value = this.duration() * this.dimension().m;
     this.onTouched();
-    if (typeof this.ngControl?.control?.markAsDirty === 'function') {
-      this.ngControl!.control?.markAsDirty();
-    }
+    this.onChange(this.value);
     this.stateChanges.next();
-  }
-
-  private getDefaultInterval(): any {
-    return this.intervals.find(i => i.default) ?? this.intervals[0];
   }
 }

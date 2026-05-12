@@ -2,11 +2,11 @@
   "name": "@kovalenko/material-duration-input",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/core": ">=19",
-    "@angular/material": ">=19",
-    "@angular/cdk": ">=19",
-    "@ngx-translate/core": ">=16",
-    "@kovalenko/base-components": "^3"
+    "@angular/core": ">=21",
+    "@angular/material": ">=21",
+    "@angular/cdk": ">=21",
+    "@ngx-translate/core": ">=17",
+    "@kovalenko/base-components": "^4"
   },
   "dependencies": {
     "tslib": "^2.3.0"

@@ -20,7 +20,7 @@
         (selectionChange)="updateDimension($event)"
         #matselect
       >
-        @for (option of intervals; track option.title) {
+        @for (option of intervals(); track option.title) {
           <mat-option [value]="option">{{ option.title | translate }}</mat-option>
         }
       </mat-select>
