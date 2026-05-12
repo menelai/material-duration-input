@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/menelai/material-duration-input/compare/v1.0.3...v2.0.0) (2026-05-12)
+
+
+### Features
+
+* signal duration ([61b125c](https://github.com/menelai/material-duration-input/commit/61b125c86aa0bbb2a07ee97c31040140ed6266f2))
+
+
+### BREAKING CHANGES
+
+* only signal form
+
 ## [1.0.3](https://github.com/menelai/material-duration-input/compare/v1.0.2...v1.0.3) (2026-02-16)
 
 
